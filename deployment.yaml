@@ -19,14 +19,6 @@ spec:
         image: nginx:1.25-alpine
         ports:
         - containerPort: 80
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
 
       initContainers:
       - name: datadog
