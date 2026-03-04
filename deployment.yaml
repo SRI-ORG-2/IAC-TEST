@@ -1,31 +1,43 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: secure-app
+  name: core-commissioning-handler
+  namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: secure-app
+      app: repro
   template:
     metadata:
       labels:
-        app: secure-app
+        app: repro
     spec:
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
+
       containers:
-        - name: secure-container
-          image: nginx:1.25-alpine
-          ports:
-            - containerPort: 80
-          securityContext:
-            readOnlyRootFilesystem: true
-            allowPrivilegeEscalation: false
-            runAsNonRoot: true
-            runAsUser: 1000
-            capabilities:
-              drop:
-                - ALL
+      - name: main-app
+        image: nginx:1.25-alpine
+        ports:
+        - containerPort: 80
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+
+      initContainers:
+      - name: datadog
+        image: nginx:latest
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - echo "init container running"
+        resources: {}
+
+      securityContext: {}
+
+      restartPolicy: Always
